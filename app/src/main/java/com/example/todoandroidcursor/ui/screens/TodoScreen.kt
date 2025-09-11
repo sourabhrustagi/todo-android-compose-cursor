@@ -35,16 +35,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.todoandroidcursor.model.Todo
 import com.example.todoandroidcursor.viewmodel.TodoViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun TodoScreen(
     onLogout: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
-    val viewModel: TodoViewModel = viewModel(factory = TodoViewModel.factory())
+    val viewModel: TodoViewModel = hiltViewModel()
     val todos = viewModel.todos.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showAddTaskDialog by remember { mutableStateOf(false) }
