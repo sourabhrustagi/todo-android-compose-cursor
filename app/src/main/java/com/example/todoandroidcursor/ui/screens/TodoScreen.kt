@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +13,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +41,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.todoandroidcursor.model.Todo
+import com.example.todoandroidcursor.ui.components.CategorySelectionComponent
+import com.example.todoandroidcursor.utils.TaskCategories
 import com.example.todoandroidcursor.viewmodel.TodoViewModel
 
 @Composable
@@ -50,47 +56,51 @@ fun TodoScreen(
     var showEditTaskDialog by remember { mutableStateOf(false) }
     var todoToDelete by remember { mutableStateOf<Todo?>(null) }
     var todoToEdit by remember { mutableStateOf<Todo?>(null) }
+    
+    val todosList = todos.value
 
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Todo",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                IconButton(onClick = onProfileClick) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.primary
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Todo",
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    IconButton(onClick = onProfileClick) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddTaskDialog = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Task"
-                )
-            }
+    floatingActionButton = {
+        FloatingActionButton(
+            onClick = { showAddTaskDialog = true }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Task"
+            )
         }
-    ) { paddingValues ->
+    }
+) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
             TodoList(
-                items = todos.value,
+                items = todosList,
                 onToggle = { id -> viewModel.toggleTodo(id) },
                 onDelete = { todo ->
                     todoToDelete = todo
@@ -107,8 +117,8 @@ fun TodoScreen(
     // Add task dialog
     if (showAddTaskDialog) {
         AddTaskDialog(
-            onAdd = { title ->
-                viewModel.addTodo(title)
+            onAdd = { title, category ->
+                viewModel.addTodo(title, category)
                 showAddTaskDialog = false
             },
             onDismiss = {
@@ -121,8 +131,8 @@ fun TodoScreen(
     if (showEditTaskDialog && todoToEdit != null) {
         EditTaskDialog(
             todo = todoToEdit!!,
-            onEdit = { newTitle ->
-                viewModel.editTodo(todoToEdit!!.id, newTitle)
+            onEdit = { newTitle, category ->
+                viewModel.editTodo(todoToEdit!!.id, newTitle, category)
                 showEditTaskDialog = false
                 todoToEdit = null
             },
@@ -175,11 +185,11 @@ fun TodoList(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items, key = { it.id }) { item ->
             TodoRow(item = item, onToggle = onToggle, onDelete = onDelete, onEdit = onEdit)
-            Divider()
         }
     }
 }
@@ -192,29 +202,70 @@ fun TodoRow(
     onEdit: (Todo) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-            Checkbox(checked = item.completed, onCheckedChange = { onToggle(item.id) })
-            Text(
-                text = item.title,
-                style = if (item.completed) {
-                    MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough)
-                } else {
-                    MaterialTheme.typography.bodyLarge
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp), 
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(checked = item.completed, onCheckedChange = { onToggle(item.id) })
+                    Column {
+                        Text(
+                            text = item.title,
+                            style = if (item.completed) {
+                                MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough)
+                            } else {
+                                MaterialTheme.typography.bodyLarge
+                            }
+                        )
+                        
+                        // Category chip
+                        if (item.category != null) {
+                            Row(
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                AssistChip(
+                                    onClick = { },
+                                    label = { 
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Text(TaskCategories.getCategoryIcon(item.category))
+                                            Text(TaskCategories.getCategoryDisplayName(item.category))
+                                        }
+                                    },
+                                    colors = AssistChipDefaults.assistChipColors(
+                                        containerColor = TaskCategories.getCategoryColor(item.category).copy(alpha = 0.3f),
+                                        labelColor = TaskCategories.getCategoryColor(item.category)
+                                    )
+                                )
+                            }
+                        }
+                    }
                 }
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = { onEdit(item) }) {
-                Text("Edit")
-            }
-            TextButton(onClick = { onDelete(item) }) {
-                Text("Delete")
+                
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { onEdit(item) }) {
+                        Text("Edit")
+                    }
+                    TextButton(onClick = { onDelete(item) }) {
+                        Text("Delete")
+                    }
+                }
             }
         }
     }
@@ -222,10 +273,11 @@ fun TodoRow(
 
 @Composable
 fun AddTaskDialog(
-    onAdd: (String) -> Unit,
+    onAdd: (String, String?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var taskText by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -233,19 +285,29 @@ fun AddTaskDialog(
             Text("Add New Task")
         },
         text = {
-            TextField(
-                value = taskText,
-                onValueChange = { taskText = it },
-                placeholder = { Text("Enter task description") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                TextField(
+                    value = taskText,
+                    onValueChange = { taskText = it },
+                    placeholder = { Text("Enter task description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                CategorySelectionComponent(
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it }
+                )
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (taskText.isNotBlank()) {
-                        onAdd(taskText.trim())
+                        onAdd(taskText.trim(), selectedCategory)
                         taskText = ""
+                        selectedCategory = null
                     }
                 },
                 enabled = taskText.isNotBlank()
@@ -257,6 +319,7 @@ fun AddTaskDialog(
             TextButton(
                 onClick = {
                     taskText = ""
+                    selectedCategory = null
                     onDismiss()
                 }
             ) {
@@ -269,10 +332,11 @@ fun AddTaskDialog(
 @Composable
 fun EditTaskDialog(
     todo: Todo,
-    onEdit: (String) -> Unit,
+    onEdit: (String, String?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var taskText by remember { mutableStateOf(todo.title) }
+    var selectedCategory by remember { mutableStateOf(todo.category) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -280,18 +344,27 @@ fun EditTaskDialog(
             Text("Edit Task")
         },
         text = {
-            TextField(
-                value = taskText,
-                onValueChange = { taskText = it },
-                placeholder = { Text("Enter task description") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                TextField(
+                    value = taskText,
+                    onValueChange = { taskText = it },
+                    placeholder = { Text("Enter task description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                CategorySelectionComponent(
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { selectedCategory = it }
+                )
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    if (taskText.isNotBlank() && taskText.trim() != todo.title) {
-                        onEdit(taskText.trim())
+                    if (taskText.isNotBlank() && (taskText.trim() != todo.title || selectedCategory != todo.category)) {
+                        onEdit(taskText.trim(), selectedCategory)
                     } else {
                         onDismiss()
                     }

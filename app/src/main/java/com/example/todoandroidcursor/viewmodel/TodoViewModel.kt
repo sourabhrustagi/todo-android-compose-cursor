@@ -23,15 +23,15 @@ class TodoViewModel @Inject constructor(
 ) : ViewModel() {
     val todos: StateFlow<List<Todo>> = getTodosUseCase()
 
-    fun addTodo(title: String) {
+    fun addTodo(title: String, category: String? = null) {
         viewModelScope.launch {
-            addTodoUseCase(title)
+            addTodoUseCase(title, category)
         }
     }
 
-    fun editTodo(id: Long, newTitle: String) {
+    fun editTodo(id: Long, newTitle: String, category: String? = null) {
         viewModelScope.launch {
-            editTodoUseCase(id, newTitle)
+            editTodoUseCase(id, newTitle, category)
         }
     }
 
