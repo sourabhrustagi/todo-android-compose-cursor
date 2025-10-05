@@ -32,11 +32,6 @@ fun AppNavigation(
         
         composable("main") {
             TodoScreen(
-                onLogout = {
-                    navController.navigate("login") {
-                        popUpTo("main") { inclusive = true }
-                    }
-                },
                 onProfileClick = {
                     navController.navigate("profile")
                 }

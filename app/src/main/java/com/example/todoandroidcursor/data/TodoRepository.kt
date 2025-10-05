@@ -10,6 +10,7 @@ import javax.inject.Singleton
 interface TodoRepository {
     val todos: StateFlow<List<Todo>>
     fun add(title: String)
+    fun edit(id: Long, newTitle: String)
     fun toggle(id: Long)
     fun delete(id: Long)
 }
@@ -27,6 +28,13 @@ class InMemoryTodoRepository @Inject constructor() : TodoRepository {
             completed = false
         )
         _todos.value = listOf(newItem) + _todos.value
+    }
+
+    override fun edit(id: Long, newTitle: String) {
+        if (newTitle.isBlank()) return
+        _todos.value = _todos.value.map { item ->
+            if (item.id == id) item.copy(title = newTitle.trim()) else item
+        }
     }
 
     override fun toggle(id: Long) {

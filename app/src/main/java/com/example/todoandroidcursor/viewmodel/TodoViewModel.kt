@@ -1,22 +1,51 @@
 package com.example.todoandroidcursor.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.todoandroidcursor.data.TodoRepository
+import androidx.lifecycle.viewModelScope
+import com.example.todoandroidcursor.domain.usecase.AddTodoUseCase
+import com.example.todoandroidcursor.domain.usecase.DeleteTodoUseCase
+import com.example.todoandroidcursor.domain.usecase.EditTodoUseCase
+import com.example.todoandroidcursor.domain.usecase.GetTodosUseCase
+import com.example.todoandroidcursor.domain.usecase.ToggleTodoUseCase
 import com.example.todoandroidcursor.model.Todo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val repository: TodoRepository
+    private val getTodosUseCase: GetTodosUseCase,
+    private val addTodoUseCase: AddTodoUseCase,
+    private val editTodoUseCase: EditTodoUseCase,
+    private val toggleTodoUseCase: ToggleTodoUseCase,
+    private val deleteTodoUseCase: DeleteTodoUseCase
 ) : ViewModel() {
-    val todos: StateFlow<List<Todo>> = repository.todos
+    val todos: StateFlow<List<Todo>> = getTodosUseCase()
 
-    fun addTodo(title: String) = repository.add(title)
-    fun toggleTodo(id: Long) = repository.toggle(id)
-    fun deleteTodo(id: Long) = repository.delete(id)
+    fun addTodo(title: String) {
+        viewModelScope.launch {
+            addTodoUseCase(title)
+        }
+    }
+
+    fun editTodo(id: Long, newTitle: String) {
+        viewModelScope.launch {
+            editTodoUseCase(id, newTitle)
+        }
+    }
+
+    fun toggleTodo(id: Long) {
+        viewModelScope.launch {
+            toggleTodoUseCase(id)
+        }
+    }
+
+    fun deleteTodo(id: Long) {
+        viewModelScope.launch {
+            deleteTodoUseCase(id)
+        }
+    }
 }
 
 
