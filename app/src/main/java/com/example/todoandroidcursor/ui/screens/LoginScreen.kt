@@ -1,6 +1,5 @@
 package com.example.todoandroidcursor.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,15 +24,27 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.todoandroidcursor.viewmodel.AuthViewModel
+import com.example.todoandroidcursor.viewmodel.LoginUiState
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var loginState by remember { mutableStateOf(LoginUiState()) }
+    
+    // Collect login state from ViewModel
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    
+    // Handle login success
+    if (isLoggedIn) {
+        onLoginSuccess()
+    }
     
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -87,9 +98,9 @@ fun LoginScreen(
                     singleLine = true
                 )
                 
-                if (errorMessage.isNotEmpty()) {
+                if (loginState.errorMessage != null) {
                     Text(
-                        text = errorMessage,
+                        text = loginState.errorMessage!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -99,28 +110,22 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         if (email.isBlank() || password.isBlank()) {
-                            errorMessage = "Please fill in all fields"
+                            loginState = loginState.copy(errorMessage = "Please fill in all fields")
                         } else if (!isValidEmail(email)) {
-                            errorMessage = "Please enter a valid email"
+                            loginState = loginState.copy(errorMessage = "Please enter a valid email")
                         } else {
-                            isLoading = true
-                            errorMessage = ""
-                            // Simulate login process
-                            // In real app, this would call authentication service
-                            if (email == "user@example.com" && password == "password") {
-                                onLoginSuccess()
-                            } else {
-                                errorMessage = "Invalid email or password"
-                                isLoading = false
+                            loginState = loginState.copy(errorMessage = null)
+                            authViewModel.login(email, password) { newState ->
+                                loginState = newState
                             }
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    enabled = !isLoading
+                    enabled = !loginState.isLoading
                 ) {
-                    if (isLoading) {
+                    if (loginState.isLoading) {
                         Text("Signing in...")
                     } else {
                         Text("Sign In")
@@ -141,7 +146,7 @@ fun LoginScreen(
 }
 
 private fun isValidEmail(email: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    return email.matches(Regex("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$"))
 }
 
 

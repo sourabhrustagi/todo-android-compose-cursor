@@ -43,16 +43,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.todoandroidcursor.R
+import com.example.todoandroidcursor.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
-    userEmail: String = "user@example.com",
     onLogout: () -> Unit = {},
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
+    
+    // Get current user info from ViewModel
+    val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
+    val userEmail = currentUser?.email ?: "user@example.com"
 
     Scaffold(
         topBar = {
@@ -172,6 +179,7 @@ fun UserProfileScreen(
         LogoutConfirmationDialog(
             onConfirm = {
                 showLogoutDialog = false
+                authViewModel.logout()
                 onLogout()
             },
             onDismiss = {
