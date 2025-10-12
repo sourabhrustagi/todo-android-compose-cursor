@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +26,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.todoandroidcursor.viewmodel.AuthViewModel
 import com.example.todoandroidcursor.viewmodel.LoginUiState
 
@@ -37,14 +37,6 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginState by remember { mutableStateOf(LoginUiState()) }
-    
-    // Collect login state from ViewModel
-    val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
-    
-    // Handle login success
-    if (isLoggedIn) {
-        onLoginSuccess()
-    }
     
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -117,6 +109,9 @@ fun LoginScreen(
                             loginState = loginState.copy(errorMessage = null)
                             authViewModel.login(email, password) { newState ->
                                 loginState = newState
+                                if (newState.isLoggedIn) {
+                                    onLoginSuccess()
+                                }
                             }
                         }
                     },

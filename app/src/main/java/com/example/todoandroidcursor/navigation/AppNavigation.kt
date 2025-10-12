@@ -1,7 +1,10 @@
 package com.example.todoandroidcursor.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,15 +12,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todoandroidcursor.ui.screens.LoginScreen
 import com.example.todoandroidcursor.ui.screens.TodoScreen
 import com.example.todoandroidcursor.ui.screens.UserProfileScreen
+import com.example.todoandroidcursor.viewmodel.AuthViewModel
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    
     NavHost(
         navController = navController,
-        startDestination = "login",
+        startDestination = if (isLoggedIn) "main" else "login",
         modifier = modifier
     ) {
         composable("login") {
@@ -41,6 +48,7 @@ fun AppNavigation(
         composable("profile") {
             UserProfileScreen(
                 onLogout = {
+                    authViewModel.logout()
                     navController.navigate("login") {
                         popUpTo("profile") { inclusive = true }
                     }
