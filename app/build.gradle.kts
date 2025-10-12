@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todoandroidcursor"
+    namespace = "com.example.todoandroid"
     compileSdk = 35
 
     defaultConfig {
