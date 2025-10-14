@@ -1,10 +1,10 @@
 package com.example.todoandroid.data.api.model
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class LoginRequest(
-    @SerializedName("email")
+    @JsonProperty("email")
     val email: String,
-    @SerializedName("password")
+    @JsonProperty("password")
     val password: String
 )

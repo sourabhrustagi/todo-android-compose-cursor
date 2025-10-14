@@ -108,10 +108,12 @@ dependencies {
     
     // Networking dependencies
     implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.jackson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
-    implementation(libs.gson)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.kotlin)
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

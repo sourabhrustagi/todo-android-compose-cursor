@@ -4,14 +4,15 @@ import android.util.Log
 import com.example.todoandroid.data.api.model.LoginRequest
 import com.example.todoandroid.data.api.model.LoginResponse
 import com.example.todoandroid.data.api.model.User
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 
 class MockLoginInterceptor : Interceptor {
     
-    private val gson = Gson()
+    private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
     
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -40,7 +41,7 @@ class MockLoginInterceptor : Interceptor {
             Log.d("MockLoginInterceptor", "Login request body: $requestBodyString")
             
             val loginRequest = try {
-                gson.fromJson(requestBodyString, LoginRequest::class.java)
+                objectMapper.readValue(requestBodyString, LoginRequest::class.java)
             } catch (e: Exception) {
                 Log.e("MockLoginInterceptor", "Failed to parse login request", e)
                 return createErrorResponse("Invalid request format")
@@ -84,7 +85,7 @@ class MockLoginInterceptor : Interceptor {
             user = user
         )
         
-        val responseBody = gson.toJson(loginResponse)
+        val responseBody = objectMapper.writeValueAsString(loginResponse)
         Log.d("MockLoginInterceptor", "Success response JSON: $responseBody")
         
         return Response.Builder()
@@ -105,7 +106,7 @@ class MockLoginInterceptor : Interceptor {
             user = null
         )
         
-        val responseBody = gson.toJson(loginResponse)
+        val responseBody = objectMapper.writeValueAsString(loginResponse)
         Log.d("MockLoginInterceptor", "Error response JSON: $responseBody")
         
         return Response.Builder()
