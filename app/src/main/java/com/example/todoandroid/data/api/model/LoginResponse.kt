@@ -21,4 +21,3 @@ data class User(
     @SerializedName("name")
     val name: String
 )
-

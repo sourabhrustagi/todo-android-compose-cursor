@@ -1,15 +1,13 @@
-package com.example.todoandroidcursor.data.api.interceptor
+package com.example.todoandroid.data.api.interceptor
 
 import android.util.Log
-import com.example.todoandroidcursor.data.api.model.LoginRequest
-import com.example.todoandroidcursor.data.api.model.LoginResponse
-import com.example.todoandroidcursor.data.api.model.User
+import com.example.todoandroid.data.api.model.LoginRequest
+import com.example.todoandroid.data.api.model.LoginResponse
+import com.example.todoandroid.data.api.model.User
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class MockLoginInterceptor : Interceptor {
     
@@ -63,7 +61,7 @@ class MockLoginInterceptor : Interceptor {
                 }
             }
             
-            Log.d("MockLoginInterceptor", "Login response: ${response.body?.string()}")
+            Log.d("MockLoginInterceptor", "Login response created successfully")
             return response
             
         } catch (e: Exception) {
@@ -87,6 +85,7 @@ class MockLoginInterceptor : Interceptor {
         )
         
         val responseBody = gson.toJson(loginResponse)
+        Log.d("MockLoginInterceptor", "Success response JSON: $responseBody")
         
         return Response.Builder()
             .request(Request.Builder().url("https://api.example.com/login").build())
@@ -107,6 +106,7 @@ class MockLoginInterceptor : Interceptor {
         )
         
         val responseBody = gson.toJson(loginResponse)
+        Log.d("MockLoginInterceptor", "Error response JSON: $responseBody")
         
         return Response.Builder()
             .request(Request.Builder().url("https://api.example.com/login").build())

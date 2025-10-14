@@ -255,7 +255,7 @@ Main Screen (task removed)
 ### User Experience
 - ✅ Intuitive navigation
 - ✅ Clear visual feedback
-- ✅ Consistent design language
+- ✅ Consistent design languages
 - ✅ Smooth user interactions
 - ✅ Proper error handling
 
@@ -264,3 +264,40 @@ Main Screen (task removed)
 **Phase 1 Status: ✅ COMPLETED**
 
 The Todo Android app Phase 1 is fully functional with all core features implemented, proper architecture established, and ready for production deployment or further development phases.
+
+Use jackson
+retry mechanism on todo fetching if fails
+business logic in viewmodel
+connect login with mock api - Done
+create user feedback screen
+User can mark todo as important
+implement privacy policy web 
+create settings page on which user can change theme
+a/b testing
+Glide
+background processing
+Lottie animation
+Firebase performance
+Fireabse machine learning
+sentry
+best practises
+analytics
+implement sliding drawer for settings and profile
+important section
+multilingual support
+Crashlytics
+Push notification for important todos
+TDD
+Error handling
+- ✅ Empty state ("No tasks yet" message)
+- Responsive 
+- typography
+  attach todo screen with mock api
+multi data fetch of todo and important list
+- feedback using mock api
+- use room for local caching of data
+- use cache mechanism
+- sonar cube
+- CI/D pipeline
+- comse cooutine function
+- swtcith between rest api graphql

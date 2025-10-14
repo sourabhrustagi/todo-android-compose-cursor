@@ -20,7 +20,41 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions += "environment"
+    
+    productFlavors {
+        create("mock") {
+            dimension = "environment"
+            applicationIdSuffix = ".mock"
+            versionNameSuffix = "-mock"
+            buildConfigField("String", "BASE_URL", "\"https://mock-api.example.com/\"")
+            buildConfigField("boolean", "USE_MOCK_INTERCEPTOR", "true")
+            buildConfigField("String", "ENVIRONMENT", "\"mock\"")
+        }
+        
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "BASE_URL", "\"https://dev-api.example.com/\"")
+            buildConfigField("boolean", "USE_MOCK_INTERCEPTOR", "false")
+            buildConfigField("String", "ENVIRONMENT", "\"development\"")
+        }
+        
+        create("production") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"https://api.example.com/\"")
+            buildConfigField("boolean", "USE_MOCK_INTERCEPTOR", "false")
+            buildConfigField("String", "ENVIRONMENT", "\"production\"")
+        }
+    }
+    
     buildTypes {
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+        }
+        
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -38,9 +72,18 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     lint {
         disable += "NullSafeMutableLiveData"
+    }
+}
+
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.incremental", "true")
+        arg("room.expandProjection", "true")
     }
 }
 

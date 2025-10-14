@@ -27,21 +27,18 @@ data class UserInfo(
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService
 ) : AuthRepository {
+    
     private val _isLoggedIn = MutableStateFlow(false)
-    override val isLoggedIn: StateFlow<Boolean>
-        get() = _isLoggedIn.asStateFlow()
-
+    override val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+    
     private val _currentUser = MutableStateFlow<UserInfo?>(null)
-    override val currentUser: StateFlow<UserInfo?>
-        get() = _currentUser.asStateFlow()
-
-    override suspend fun login(
-        email: String,
-        password: String
-    ): Result<LoginResponse> {
+    override val currentUser: StateFlow<UserInfo?> = _currentUser.asStateFlow()
+    
+    override suspend fun login(email: String, password: String): Result<LoginResponse> {
         return try {
             val loginRequest = LoginRequest(email = email, password = password)
             val response = authApiService.login(loginRequest)
+            
             if (response.isSuccessful && response.body() != null) {
                 val loginResponse = response.body()!!
                 if (loginResponse.success) {
@@ -68,10 +65,9 @@ class AuthRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
+    
     override fun logout() {
         _isLoggedIn.value = false
         _currentUser.value = null
     }
-
 }

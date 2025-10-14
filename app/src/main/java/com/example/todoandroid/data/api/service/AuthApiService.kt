@@ -10,4 +10,3 @@ interface AuthApiService {
     @POST("login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 }
-
