@@ -265,24 +265,25 @@ Main Screen (task removed)
 
 The Todo Android app Phase 1 is fully functional with all core features implemented, proper architecture established, and ready for production deployment or further development phases.
 
-Use jackson
+create user feedback screen
+implement privacy policy web
+create settings page on which user can change theme
+Lottie animation
+implement sliding drawer for settings and profile
+
 retry mechanism on todo fetching if fails
 business logic in viewmodel
 connect login with mock api - Done
-create user feedback screen
 User can mark todo as important
 implement privacy policy web 
-create settings page on which user can change theme
 a/b testing
 Glide
 background processing
-Lottie animation
 Firebase performance
 Fireabse machine learning
 sentry
 best practises
 analytics
-implement sliding drawer for settings and profile
 important section
 multilingual support
 Crashlytics
