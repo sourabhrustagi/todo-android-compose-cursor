@@ -265,17 +265,27 @@ Main Screen (task removed)
 
 The Todo Android app Phase 1 is fully functional with all core features implemented, proper architecture established, and ready for production deployment or further development phases.
 
+
 create user feedback screen
 implement privacy policy web
 create settings page on which user can change theme
 Lottie animation
 implement sliding drawer for settings and profile
-
-retry mechanism on todo fetching if fails
 business logic in viewmodel
-connect login with mock api - Done
 User can mark todo as important
-implement privacy policy web 
+connect login with mock api - Done
+important section
+- ✅ Empty state ("No tasks yet" message)
+- feedback using mock api
+- general api to gettig all the settings on todo using background processing
+- load faq using mock api
+- download change log once in application
+- logout api
+- mobile otp login 
+- sign up api
+
+Following tasks for understanding the best arhitecture
+retry mechanism on todo fetching if fails
 a/b testing
 Glide
 background processing
@@ -284,18 +294,14 @@ Fireabse machine learning
 sentry
 best practises
 analytics
-important section
 multilingual support
 Crashlytics
 Push notification for important todos
 TDD
 Error handling
-- ✅ Empty state ("No tasks yet" message)
 - Responsive 
 - typography
-  attach todo screen with mock api
 multi data fetch of todo and important list
-- feedback using mock api
 - use room for local caching of data
 - use cache mechanism
 - sonar cube
